@@ -23,14 +23,15 @@ export const register = async (req, res) => {
             return res.status(400).json({ message: "invalid username" });
         } else if (!validateDNI(dni)){
             return res.status(400).json({ message: "invalid dni" });
-        }
-
+        }   
+        console.log("REGISTER RAN VALIDATIONS")
         let user = await User.findOne({
             where: {
-                [Op.or]: [ {email}, {dni}, {username} ]
+                [Op.or]: [ {dni}, {email},  {username} ]
                 
             }
         });
+        console.log("REGISTER SEARCHED USER")
         
         
         if (user && !user.deleted){
@@ -61,6 +62,7 @@ export const register = async (req, res) => {
         
         res.json(newUser.id);
     } catch (error) {
+        console.log(error)
         res.status(500).json({ message: "server error" });
     }
 };
@@ -71,10 +73,6 @@ export const login = async (req, res) => {
     const resultEmail = validateEmail(email);
     if (!resultEmail)
         return res.status(401).send({ message: "invalid email" });
-
-    const resultPassword = validatePassword(password);
-    if (!resultPassword)
-        return res.status(401).send({ message: "invalid password" });
 
     const user = await User.findOne({
         where: {
@@ -88,14 +86,24 @@ export const login = async (req, res) => {
 
     const comparison = await bcrypt.compare(password, user.password);
 
+
+
     if (!comparison)
         return res.status(401).send({ message: "wrong password" });
 
 
     const token = jwt.sign({ id: user.id, email, status:user.status }, secretKey, { expiresIn: "1h" });
 
-    return res.json({token, id: user.id, status: user.status, purchases: user.Purchases, products: user.Products });
+    return res.json({
+        token, 
+        id: user.id, 
+        username:user.username,
+        email,
+        status: user.status, 
+        purchases: user.Purchases, 
+        products: user.Products });
 };
+
 
 export const getAllUsers = async (req, res) => {
     try {
@@ -136,10 +144,10 @@ export const getUserById = async (req, res) => {
 export const updateUser = async (req, res) => {
     try {
         
-        const { username, email, password, dni } = req.body;
+        const { username, email, password, dni, status } = req.body;
         const { id } = req.params;
 
-        const { status } = req.user;
+        const currentStatus = req.user.status;
         
 
 
@@ -157,8 +165,8 @@ export const updateUser = async (req, res) => {
 
         if(status && ![ "Buyer", "Seller", "SysAdmin"].includes(status))
             return res.status(400).json({ message: "invalid status" });
-
-        if(req.user.status !== "SysAdmin" && !(req.user.status === "Buyer" && status === "Seller"))
+        
+        if(req.user.status !== "SysAdmin" && (currentStatus !== "Buyer" && status !== "Seller"))
             return res.status(403).json({ message: "insufficient permissions" });
 
         if (password) {

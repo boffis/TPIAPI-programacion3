@@ -10,12 +10,10 @@ export const User = sequelize.define("user", {
     username: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true
     },
     dni: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true
     },
     password: {
         type: DataTypes.TEXT,
@@ -31,5 +29,9 @@ export const User = sequelize.define("user", {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false
-    }
+    },
+    email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
 },{ timestamps: false })

@@ -5,14 +5,14 @@ import {Purchase} from "../models/Purchase.js";
 
 export const createProduct = async (req, res) => {
     try {
-        const { name, desc, price, stock, type, tags } = req.body;
+        const { name, desc, price, stock, type, imageURL, tags } = req.body;
         const { status, id: userId } = req.user;
         
-        if (!name || !price || !stock || !userId || !status || !type) {
+        if (!name || !price || !stock || !userId ||!imageURL || !status || !type) {
             return res.status(400).json({ message: "missing required fields" });
         }
 
-        if (status !== "SysAdmin" || status !== "Seller") {
+        if (status !== "SysAdmin" && status !== "Seller") {
             return res.status(403).json({ message: "insufficient permissions" });
         }
 
@@ -23,6 +23,7 @@ export const createProduct = async (req, res) => {
             desc,
             price,
             stock,
+            imageURL,
             userId
         });
 

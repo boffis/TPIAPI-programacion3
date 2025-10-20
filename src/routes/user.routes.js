@@ -15,11 +15,11 @@ router.post("/register", register)
 
 router.get("/users", verifyToken, getAllUsers)
 
-router.get("/users/:id", verifyToken, getUserById);
+router.get("/user/:id", verifyToken, getUserById);
 
-router.put("/users/:id", verifyToken, updateUser);
+router.put("/user/:id", verifyToken, updateUser);
 
-router.delete("/users/:id", verifyToken, deleteUser);
+router.delete("/user/:id", verifyToken, deleteUser);
 
 
 export default router;

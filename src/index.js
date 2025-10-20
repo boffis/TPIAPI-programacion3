@@ -4,17 +4,24 @@ import userRoutes from './routes/user.routes.js';
 import productRoutes from './routes/product.routes.js';
 import { sequelize } from './db.js';
 
-import "./models/User.js";
 import "./models/Product.js";
 import "./models/Purchase.js";
 import "./models/ProductPurchase.js";
+import "./models/User.js";
 
 import './models/Relations.js';
 
 const app = express();
+import cors from 'cors';
 
 try {
     
+    
+    app.use(cors({
+        origin: 'http://localhost:5173',
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+    }));
     app.use(express.json());
     app.use((req, res, next) => {
         res.header("Access-Control-Allow-Origin", "*");
@@ -23,11 +30,13 @@ try {
         next();
     })
 
-    app.listen(PORT);
     app.use(userRoutes)
     app.use(productRoutes)
-    
+    console.log("Modelos registrados:", sequelize.models);
+
     await sequelize.sync({alter: true});
+    
+    app.listen(PORT);
 
     console.log( `Server listening at port:${PORT}` );
 

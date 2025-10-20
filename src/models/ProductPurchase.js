@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../db.js";
 
-export const ProductPurchase = sequelize.define("ProductPurchase", {
+export const ProductPurchase = sequelize.define("productPurchase", {
     quantity: {
         type: DataTypes.INTEGER,
         allowNull: false,

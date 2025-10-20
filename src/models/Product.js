@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../db.js";
 
-export const Product = sequelize.define("user", {
+export const Product = sequelize.define("product", {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -27,7 +27,7 @@ export const Product = sequelize.define("user", {
         allowNull: false,
     },
     type: {
-        //Top, Bottom, Shoes, Accessory
+        //Top, Bottom, Footwear, Accessory
         type: DataTypes.STRING,
         allowNull: false,
         defaultValue:"Accessory",
