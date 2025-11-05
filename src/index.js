@@ -2,8 +2,9 @@ import express from 'express';
 import { PORT } from './config.js';
 import userRoutes from './routes/user.routes.js';
 import productRoutes from './routes/product.routes.js';
+import purchaseRoutes from './routes/purchase.routes.js'
 import { sequelize } from './db.js';
-
+import { initialData } from './utils/initialData.js';
 import "./models/Product.js";
 import "./models/Purchase.js";
 import "./models/ProductPurchase.js";
@@ -32,9 +33,12 @@ try {
 
     app.use(userRoutes)
     app.use(productRoutes)
-    console.log("Modelos registrados:", sequelize.models);
+    app.use(purchaseRoutes)
+    console.log("Created Models:", sequelize.models);
 
-    await sequelize.sync({alter: true});
+    await sequelize.sync({force: true});
+
+    await initialData()
     
     app.listen(PORT);
 

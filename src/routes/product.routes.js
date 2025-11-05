@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { verifyToken } from "../utils/auth.js";
-import { createProduct, deleteProduct, getProducts, getProductById, updateProduct } from "../services/product.services.js";
+import { createProduct, deleteProduct, getProducts, getProductById, updateProduct, getProductsAdmin } from "../services/product.services.js";
 
 const router = Router();
 
@@ -10,7 +10,9 @@ router.put("/product/:id", verifyToken, updateProduct)
 
 router.delete("/product/:id", verifyToken, deleteProduct)
 
-router.get("/product", getProducts)
+router.get("/products", getProducts)
+
+router.get("/products/admin",verifyToken , getProductsAdmin)
 
 router.get("/product/:id", verifyToken, getProductById)
 

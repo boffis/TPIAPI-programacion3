@@ -10,7 +10,6 @@ export const verifyToken = (req, res, next) => {
     try {
         const payload = jwt.verify(token, secretKey);
             
-        console.log(payload)
         req.user = payload;
         next();
     } catch (error) {

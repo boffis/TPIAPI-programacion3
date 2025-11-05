@@ -1,7 +1,7 @@
 
-import { Purchase } from "../models/Purchase"
-import { Product } from "../models/Product"
-import { User } from "../models/User"
+import { Purchase } from "../models/Purchase.js"
+import { Product } from "../models/Product.js"
+import { User } from "../models/User.js"
 
 export const getPurchase = async (req, res) => {
     try {
@@ -31,6 +31,7 @@ export const getPurchase = async (req, res) => {
 
 export const makePurchase = async (req, res) => {
     try {
+        console.log("reached post purchase")
         const { products } = req.body;
         const { id: buyerId } = req.user;
         
@@ -43,29 +44,38 @@ export const makePurchase = async (req, res) => {
             return res.status(404).json({ message: "buyer not found" });
 
         
-        const purchase = Purchase.create({
+        const purchase = await Purchase.create({
             userId: buyerId
         })
 
         let total = 0;
+        
         for (const element of products ) {
             const product = await Product.findByPk(element.id)
-            if (!product || product.stock <= element.quantity || product.deleted)
+            if (!product  || product.deleted)
                 return res.status(404).json({ message: `product with id ${element.id} not found`
                 });
+                console.log(product.stock)
+                console.log(element)
+            if ( product.stock >=element.quantity) {
+                await product.update({ stock: product.stock - element.quantity });
+            } else {
+                res.status(400).json({message:`${element.name} doesnt have enough stock`})
+            }
 
-            await product.update({ stock: product.stock - element.quantity });
-
-            product.subTotal = product.price * element.quantity;
-            total += product.subTotal;
-            await purchase.addProduct(product, { through: { quantity: element.quantity }})
+            element.subtotal = product.price * element.quantity;
+            total += element.subtotal;
+            await purchase.addProduct(product, { through: { quantity: element.quantity, subtotal:element.subtotal}})
         };
 
         await purchase.update({ total });
-
-        res.status(201).json({ message: "purchase created", purchaseId: purchase.id });
+        const toSendPurchase = await Purchase.findByPk(purchase.id, {
+                    include: [{ model: Product }, { model: User, attributes: { exclude: ['password'] } }]
+                });
+        res.status(201).json({ message: "purchase created", purchase:toSendPurchase });
 
     } catch (error) {
+        console.log(error)
         res.status(500).json({ message: "server error" });
     }
 

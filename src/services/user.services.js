@@ -48,9 +48,8 @@ export const register = async (req, res) => {
         
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // :p
-        let status
-        username === "admin" ? status = "SysAdmin" : status = "Buyer";
+        // Already inserted Sysadmin
+        let status = "Buyer";
 
         const newUser = await User.create({
             username,
@@ -84,6 +83,7 @@ export const login = async (req, res) => {
     if (!user || user.deleted )
         return res.status(401).send({ message: "no user with that email" });
 
+    
     const comparison = await bcrypt.compare(password, user.password);
 
 
@@ -100,8 +100,8 @@ export const login = async (req, res) => {
         username:user.username,
         email,
         status: user.status, 
-        purchases: user.Purchases, 
-        products: user.Products });
+        purchases: user.purchases, 
+        products: user.products });
 };
 
 
@@ -209,7 +209,7 @@ export const deleteUser = async (req, res) => {
         if (!user)
             return res.status(404).json({ message: "user not found" });
 
-        if (req.user.status !== "SysAdmin" && req.user.id !== id) {
+        if (req.user.status !== "SysAdmin" && req.user.id.toString() !== id) {
             return res.status(403).json({ message: "insufficient permissions" });
         }
 
