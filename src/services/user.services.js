@@ -215,6 +215,11 @@ export const deleteUser = async (req, res) => {
 
         await user.update({ deleted: true });
 
+        await Product.update(
+            { deleted: true },
+            { where: { userId: id } }
+        );
+        
         res.json({ message: "user deleted" });
     } catch (error) {
         res.status(500).json({ message: "server error" });

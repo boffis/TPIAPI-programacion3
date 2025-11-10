@@ -17,7 +17,6 @@ export const createProduct = async (req, res) => {
             return res.status(403).json({ message: "insufficient permissions" });
         }
 
-        //!faltarian validaciones de los campos pe
 
         const newProduct = await Product.create({
             name,
@@ -113,7 +112,7 @@ export const getProductById = async (req, res) => {
 
         let relations = [{ model: User }];
         
-        
+        console.log(product)
         
         if (status === "SysAdmin" || (status === "Seller" && product.user.id == userId)) {
             relations.push( {model:Purchase});
@@ -122,7 +121,7 @@ export const getProductById = async (req, res) => {
         const productWithRelations = await Product.findByPk(id, {include: relations });
 
 
-        if (!product || product.deleted)
+        if (!product)
             return res.status(404).json({ message: "product not found" });
 
         res.json(productWithRelations);
